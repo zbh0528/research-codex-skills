@@ -15,6 +15,7 @@ This repository is a curated skill hub rather than a dump of prompts. Each skill
 | Skill | Purpose | Status |
 | --- | --- | --- |
 | [`academic-reply-letter`](skills/academic-reply-letter/SKILL.md) | Draft, audit, and polish point-by-point academic response letters with evidence-linked manuscript anchors and bilingual internal audit blocks. | Ready |
+| [`scientific-english-optimizer`](skills/scientific-english-optimizer/SKILL.md) | Polish scientific manuscript English by improving logic, precision, concision, and claim discipline without exposing author-specific writing sources. | Ready |
 
 ## Skill Design Standard
 
@@ -35,6 +36,8 @@ For the `academic-reply-letter` skill, this means:
 
 See [docs/academic-reply-letter-design.md](docs/academic-reply-letter-design.md) for the design rationale.
 
+The `scientific-english-optimizer` skill follows the same privacy-first standard. It exposes general scientific-writing principles rather than private corpora, identifiable author styles, or source-specific writing fingerprints. See [docs/scientific-english-optimizer-design.md](docs/scientific-english-optimizer-design.md).
+
 ## Install a Skill
 
 Copy a skill folder into your local Codex skills directory:
@@ -42,6 +45,7 @@ Copy a skill folder into your local Codex skills directory:
 ```bash
 mkdir -p ~/.codex/skills
 cp -R skills/academic-reply-letter ~/.codex/skills/
+cp -R skills/scientific-english-optimizer ~/.codex/skills/
 ```
 
 Then restart Codex or reload skills.
@@ -52,6 +56,12 @@ Run the repository-level skill check:
 
 ```bash
 python3 scripts/validate_skill.py
+```
+
+Run the privacy scan before publishing new skills:
+
+```bash
+python3 scripts/privacy_scan.py
 ```
 
 If you have a DOCX response letter and `python-docx` installed, run:
