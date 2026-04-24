@@ -14,3 +14,5 @@ jobs:
           python-version: "3.11"
       - name: Validate skill rules
         run: python3 scripts/validate_skill.py
+      - name: Run privacy scan
+        run: python3 scripts/privacy_scan.py
