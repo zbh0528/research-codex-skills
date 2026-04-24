@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repository-level validation for the academic-reply-letter skill."""
+"""Repository-level validation for research Codex skills."""
 
 from __future__ import annotations
 
@@ -9,10 +9,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL = ROOT / "skills" / "academic-reply-letter" / "SKILL.md"
+SKILLS_DIR = ROOT / "skills"
 
 
-REQUIRED_PHRASES = [
+GLOBAL_REQUIRED_FRONTMATTER = ["name", "description"]
+
+REPLY_LETTER_REQUIRED_PHRASES = [
     "No evidence, no completed claim",
     "Response: Thank you",
     "Response: Thanks",
@@ -21,6 +23,14 @@ REQUIRED_PHRASES = [
     "marked in blue",
     "Anchor Requirement",
     "If editing DOCX",
+]
+
+SCIENTIFIC_ENGLISH_REQUIRED_PHRASES = [
+    "Preserve the user's technical meaning",
+    "not an author-style imitation tool",
+    "claim discipline",
+    "Precision Pass",
+    "No datasets, metrics, baselines, statistical tests, citations, or novelty claims are invented",
 ]
 
 
@@ -42,23 +52,34 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 
 def main() -> None:
-    if not SKILL.exists():
-        fail(f"missing {SKILL.relative_to(ROOT)}")
+    skill_files = sorted(SKILLS_DIR.glob("*/SKILL.md"))
+    if not skill_files:
+        fail("no skills found under skills/*/SKILL.md")
 
-    text = SKILL.read_text(encoding="utf-8")
-    frontmatter = parse_frontmatter(text)
+    for skill in skill_files:
+        text = skill.read_text(encoding="utf-8")
+        frontmatter = parse_frontmatter(text)
 
-    if frontmatter.get("name") != "academic-reply-letter":
-        fail("frontmatter name must be academic-reply-letter")
-    if "description" not in frontmatter or len(frontmatter["description"]) < 80:
-        fail("frontmatter description is missing or too short")
+        for key in GLOBAL_REQUIRED_FRONTMATTER:
+            if key not in frontmatter:
+                fail(f"{skill.relative_to(ROOT)} missing frontmatter field: {key}")
+        if len(frontmatter["description"]) < 80:
+            fail(f"{skill.relative_to(ROOT)} description is too short")
 
-    text_lower = text.lower()
-    missing = [phrase for phrase in REQUIRED_PHRASES if phrase.lower() not in text_lower]
-    if missing:
-        fail("missing required phrases: " + ", ".join(missing))
+        text_lower = text.lower()
+        name = frontmatter["name"]
+        if name == "academic-reply-letter":
+            required = REPLY_LETTER_REQUIRED_PHRASES
+        elif name == "scientific-english-optimizer":
+            required = SCIENTIFIC_ENGLISH_REQUIRED_PHRASES
+        else:
+            required = []
 
-    print("OK: skill structure and core rules validated")
+        missing = [phrase for phrase in required if phrase.lower() not in text_lower]
+        if missing:
+            fail(f"{skill.relative_to(ROOT)} missing required phrases: " + ", ".join(missing))
+
+    print(f"OK: {len(skill_files)} skill(s) validated")
 
 
 if __name__ == "__main__":
